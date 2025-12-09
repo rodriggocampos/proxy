@@ -1,0 +1,59 @@
+@startuml
+title Padrão Proxy - Cenário Conta Bancária
+
+interface IConta {
+    + List<String> obterDadosBasicos()
+    + List<Float> obterDadosFinanceiros(FuncionarioBanco funcionario)
+}
+
+class ContaBancaria implements IConta {
+    - Integer numero
+    - String titular
+    - String agencia
+    - Float saldo
+    - Float limite
+
+    + ContaBancaria(Integer numero)
+    + ContaBancaria(Integer numero, String titular, String agencia, Float saldo, Float limite)
+    + Integer getNumero()
+    + List<String> obterDadosBasicos()
+    + List<Float> obterDadosFinanceiros(FuncionarioBanco funcionario)
+}
+
+class ContaBancariaProxy implements IConta {
+    - ContaBancaria conta
+    - Integer numero
+
+    + ContaBancariaProxy(Integer numero)
+    + List<String> obterDadosBasicos()
+    + List<Float> obterDadosFinanceiros(FuncionarioBanco funcionario)
+}
+
+class BDConta {
+    - static Map<Integer, ContaBancaria> contas
+
+    + static ContaBancaria getConta(Integer numero)
+    + static void addConta(ContaBancaria conta)
+}
+
+class FuncionarioBanco {
+    - String nome
+    - boolean gerente
+
+    + FuncionarioBanco(String nome, boolean gerente)
+    + String getNome()
+    + boolean isGerente()
+    + void setGerente(boolean gerente)
+}
+
+IConta <|.. ContaBancaria
+IConta <|.. ContaBancariaProxy
+
+ContaBancariaProxy --> ContaBancaria : "realSubject"
+ContaBancariaProxy --> BDConta : usa
+BDConta --> ContaBancaria : armazena
+
+ContaBancaria --> FuncionarioBanco : obterDadosFinanceiros(param)
+ContaBancariaProxy --> FuncionarioBanco : obterDadosFinanceiros(param)
+
+@enduml
